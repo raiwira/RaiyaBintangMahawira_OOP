@@ -2,97 +2,61 @@ package com.raiya.frontend;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.utils.ScreenUtils;
-
-/** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
-public class Main extends ApplicationAdapter {
-    private SpriteBatch batch;
-    private Texture image;
-
-    @Override
-    public void create() {
-        batch = new SpriteBatch();
-        image = new Texture("libgdx.png");
-    }
-
-    @Override
-    public void render() {
-        ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
-        batch.begin();
-        batch.draw(image, 140, 210);
-        batch.end();
-    }
-
-    @Override
-    public void dispose() {
-        batch.dispose();
-        image.dispose();
-    }
-    package com.netlab.frontend;
-
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-    public class Main extends ApplicationAdapter {
-        private ShapeRenderer shapeRenderer;
+public class Main extends ApplicationAdapter {
+    private ShapeRenderer shapeRenderer;
+    private List<GameObject> gameObjects;
 
-        // TODO 1: Declare fields for Player, Fairy, Boss, Items, and List<GameObject>
+    private Player player;
+    private Fairy fairy;
+    private Boss boss;
+    private Item pointItem;
+    private Item powerItem;
 
+    @Override
+    public void create() {
+        shapeRenderer = new ShapeRenderer();
+        gameObjects = new ArrayList<>();
 
-        @Override
-        public void create() {
-            shapeRenderer = new ShapeRenderer();
-            gameObjects = new ArrayList<>();
+        player = new Player(280, 40, "Reimu", 100, 15, 3);
+        fairy = new Fairy(150, 380, "Stage 1 Fairy", 20);
+        boss = new Boss(380, 400, "Cirno", 150);
 
-            // TODO 2: Instantiate Player (Red square) at (280, 40)
+        pointItem = new Item(200, 450, 12, 12, 120f, "Point Item", 1000L);
+        powerItem = new Item(300, 480, 12, 12, 100f, "Power Item", 500L);
 
-
-            // TODO 3: Instantiate Fairy (Pink square) at (150, 380)
-
-
-            // TODO 4: Instantiate Boss (Blue square) at (380, 400)
-
-
-            // TODO 5: Instantiate Items (White squares) with downward speeds
-
-
-            // TODO 6: Add all entities into the gameObjects list polymorphically
-
-        }
-
-        @Override
-        public void render() {
-            float delta = Gdx.graphics.getDeltaTime();
-
-            // 1. Polymorphic Update Loop: Items move downward automatically via Item.update(delta)
-            for (GameObject obj : gameObjects) {
-                obj.update(delta);
-            }
-
-            // 2. Clear Screen
-            ScreenUtils.clear(0.1f, 0.1f, 0.15f, 1f);
-
-            // 3. Polymorphic Render Loop: Draw hitboxes with ShapeRenderer
-            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-            for (GameObject obj : gameObjects) {
-                obj.render(shapeRenderer);
-            }
-            shapeRenderer.end();
-        }
-
-        @Override
-        public void dispose() {
-            if (shapeRenderer != null) {
-                shapeRenderer.dispose();
-            }
-        }
+        gameObjects.add(player);
+        gameObjects.add(fairy);
+        gameObjects.add(boss);
+        gameObjects.add(pointItem);
+        gameObjects.add(powerItem);
     }
 
+    @Override
+    public void render() {
+        float delta = Gdx.graphics.getDeltaTime();
+
+        for (GameObject obj : gameObjects) {
+            obj.update(delta);
+        }
+
+        ScreenUtils.clear(0.1f, 0.1f, 0.15f, 1f);
+
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        for (GameObject obj : gameObjects) {
+            obj.render(shapeRenderer);
+        }
+        shapeRenderer.end();
+    }
+
+    @Override
+    public void dispose() {
+        if (shapeRenderer != null) {
+            shapeRenderer.dispose();
+        }
+    }
 }

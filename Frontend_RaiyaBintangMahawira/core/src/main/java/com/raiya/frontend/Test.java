@@ -9,8 +9,8 @@ public class Test {
         Enemy fairyBoss = new Enemy("Cirno (Stage 2 Boss)", 50);
 
         System.out.println("\n--- Initial Battle State ---");
-        System.out.println("Player: " + reimu.name + " | HP: " + reimu.hp + " | Power: " + reimu.power + " | SpellCards: " + reimu.spellCards);
-        System.out.println("Enemy:  " + fairyBoss.name + " | HP: " + fairyBoss.hp);
+        System.out.println("Player: " + reimu.getName() + " | HP: " + reimu.getHp() + " | Power: " + reimu.getPower() + " | SpellCards: " + reimu.getSpellCards());
+        System.out.println("Enemy:  " + fairyBoss.getName() + " | HP: " + fairyBoss.getHp());
 
         System.out.println("\n--- Turn 1: Player Shoots Enemy ---");
         reimu.shoot(fairyBoss);
@@ -27,11 +27,11 @@ public class Test {
         System.out.println("\n=== Battle Simulation Complete ===");
 
         // ==========================================
-// MODULE 2: ENCAPSULATION, INHERITANCE & SCORE SYSTEM
-// ==========================================
+        // MODULE 2: ENCAPSULATION, INHERITANCE & SCORE SYSTEM
+        // ==========================================
         System.out.println("\n\n=== TOUHOU OOP PRACTICUM - MODULE 2: ENCAPSULATION, INHERITANCE & SCORE SYSTEM ===");
 
-// Instantiating polymorphic objects
+        // Instantiating polymorphic objects
         Player reimu2 = new Player("Reimu Hakurei", 100, 15, 3);
         Fairy fairy = new Fairy("Stage 1 Fairy", 20);
         Boss cirno = new Boss("Cirno (Stage 2 Boss)", 150);
@@ -56,6 +56,5 @@ public class Test {
         System.out.println("Final Score: " + reimu2.getScore() + " pts");
 
         System.out.println("\n=== Module 2 Test Completed Successfully ===");
-
     }
 }
