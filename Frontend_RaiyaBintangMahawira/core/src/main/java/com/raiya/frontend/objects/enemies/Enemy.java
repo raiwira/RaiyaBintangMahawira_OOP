@@ -1,11 +1,15 @@
-package com.raiya.frontend;
+package com.raiya.frontend.objects.enemies;
 
 import com.badlogic.gdx.graphics.Color;
+import com.raiya.frontend.objects.Collidable;
+import com.raiya.frontend.objects.GameObject;
+import com.raiya.frontend.objects.Player;
+import com.raiya.frontend.objects.items.Item;
 
 public class Enemy extends GameObject {
-    private String name;
-    private int hp;
-    private int maxHp;
+    protected String name;
+    protected int hp;
+    protected int maxHp;
     protected long scoreValue;
 
     public Enemy(String name, int hp) {
@@ -13,7 +17,7 @@ public class Enemy extends GameObject {
         this.name = name;
         this.hp = hp;
         this.maxHp = hp;
-        this.scoreValue = 100L;
+        this.scoreValue = 100;
     }
 
     public Enemy(float x, float y, float width, float height, Color color, String name, int hp, long scoreValue) {
@@ -25,30 +29,30 @@ public class Enemy extends GameObject {
     }
 
     public boolean takeDamage(int damage) {
-        if (getHp() == 0) {
-            return false;
+        boolean wasAlive = isAlive();
+        this.hp -= damage;
+        if (this.hp < 0) {
+            this.hp = 0;
         }
-
-        setHp(getHp() - damage);
-
-        if (getHp() > 0) {
-            System.out.println(getName() + " took " + damage + " damage!!, HP : [" + getHp() + "/" + getMaxHp() + "]");
-            return false;
-        } else {
-            System.out.println(getName() + " was defeated!!!!");
+        System.out.println(name + " took " + damage + " damage! HP: " + this.hp + "/" + this.maxHp);
+        if (wasAlive && this.hp == 0) {
+            System.out.println(name + " was defeated!");
+            destroy();
             return true;
         }
+        return false;
     }
 
     public void attack(Player player, int damage) {
-        System.out.println(getName() + " unleashes bullet barrage on " + player.getName() + "!");
+        System.out.println(name + " unleashes bullet barrage on " + player.getName() + "!");
         player.takeDamage(damage);
     }
 
     public boolean isAlive() {
-        return getHp() > 0;
+        return this.hp > 0;
     }
 
+    // Encapsulation getters and setters
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
 
