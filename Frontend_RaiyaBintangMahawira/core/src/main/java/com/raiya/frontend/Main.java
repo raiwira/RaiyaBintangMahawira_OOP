@@ -51,7 +51,7 @@ public class Main extends ApplicationAdapter {
         entities.add(pointItem);
     }
 
-    public static <T extends GameObject> void updateAndClean(com.badlogic.gdx.scenes.scene2d.ui.List<T> list, float delta, float screenWidth, float screenHeight) {
+    public static <T extends GameObject> void updateAndClean(java.util.List<T> list, float delta, float screenWidth, float screenHeight) {
         // Complete this method
         // 1. Get an Iterator<T> from the given list.
 
@@ -60,8 +60,10 @@ public class Main extends ApplicationAdapter {
         while (iterator.hasNext()) {
             T object = iterator.next();
             object.update(delta);
-            if (object.isOffScreen(screenWidth, screenHeight)) { //logic remove process
-                System.out.println("Removed Via Generic Iterator : " + object.getClass().getSimpleName());
+
+            // Added the missing || object.isDestroyed() condition
+            if (object.isOffScreen(screenWidth, screenHeight) || object.isDestroyed()) {
+                System.out.println("Removed via Generic Iterator: " + object.getClass().getSimpleName());
                 iterator.remove();
             }
         }
@@ -81,7 +83,7 @@ public class Main extends ApplicationAdapter {
 
         // TODO 1: If the Z key was just pressed, add a new bullet from player.shootBullet()
         if (Gdx.input.isKeyJustPressed(Input.Keys.Z)) {
-            player.shootBullet() = new Bullet();
+            entities.add(player.shootBullet());
         }
         // to the entities list.
         // Clue: Gdx.input.isKeyJustPressed()
@@ -118,9 +120,8 @@ public class Main extends ApplicationAdapter {
             // TODO 3: Use an if statement to check whether the entity has not been destroyed (!entity.isDestroyed()).
             // If so, call entity.render(shapeRenderer);
             if (!entity.isDestroyed()) {
-
+                entity.render(shapeRenderer);
             }
-            entity.render(shapeRenderer);
         }
         shapeRenderer.end();
     }
