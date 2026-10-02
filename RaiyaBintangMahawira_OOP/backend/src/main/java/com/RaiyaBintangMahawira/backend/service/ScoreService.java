@@ -56,9 +56,9 @@ public class ScoreService {
         // 1. Find the score you want to delete using scoreRepository, then store that score (hint: see how it's done in getScoreById())
         Optional<Score> score = scoreRepository.findById(scoreId);
         // 2. Check whether the score was found or not with `.orElseThrow(()-> new RuntimeException("Score with ID " + scoreId + " was not found"));`
-        score.orElseThrow(()-> new RuntimeException("Score with ID " + scoreId + " was not found"));
+        Score scoreDelete = score.orElseThrow(()-> new RuntimeException("Score with ID " + scoreId + " was not found"));
         // 3. Call delete() from scoreRepository to delete the score stored earlier
-        deleteScore(scoreId);
+        scoreRepository.delete(scoreDelete);
 
     }
 
