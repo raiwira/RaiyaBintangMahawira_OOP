@@ -1,5 +1,11 @@
 package com.raiya.frontend;
 
+import com.raiya.frontend.objects.enemies.Boss;
+import com.raiya.frontend.objects.Enemy;
+import com.raiya.frontend.objects.enemies.Fairy;
+import com.raiya.frontend.objects.Item;
+import com.raiya.frontend.objects.Player;
+
 public class Test {
     public static void main(String[] args) {
         System.out.println("=== TOUHOU OOP PRACTICUM - MODULE 1: BASIC CLASSES & OBJECT INTERACTION ===");

@@ -1,4 +1,4 @@
-package com.raiya.frontend;
+package com.raiya.frontend.objects;
 
 import com.badlogic.gdx.graphics.Color;
 
