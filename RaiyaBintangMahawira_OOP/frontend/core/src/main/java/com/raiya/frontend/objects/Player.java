@@ -3,6 +3,7 @@ package com.raiya.frontend.objects;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
+import com.raiya.frontend.objects.bullets.BulletType;
 import com.raiya.frontend.objects.enemies.Enemy;
 import com.raiya.frontend.objects.items.Item;
 import com.raiya.frontend.objects.items.ItemType;
@@ -16,7 +17,7 @@ public class Player extends com.raiya.frontend.objects.GameObject {
     private long score;
 
     public Player(String name, int hp, int power, int spellCards) {
-        super(280, 40, 32, 32, 200f, Color.RED);
+        super(280, 40, 32, 48, 200f, Color.RED);
         this.name = name;
         this.hp = hp;
         this.power = power;
@@ -25,7 +26,7 @@ public class Player extends com.raiya.frontend.objects.GameObject {
     }
 
     public Player(float x, float y, String name, int hp, int power, int spellCards) {
-        super(x, y, 32, 32, 200f, Color.RED);
+        super(x, y, 32, 48, 200f, Color.RED);
         this.name = name;
         this.hp = hp;
         this.power = power;

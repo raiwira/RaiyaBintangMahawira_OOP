@@ -1,4 +1,4 @@
-package com.raiya.frontend.objects;
+package com.raiya.frontend.objects.bullets;
 
 public enum BulletType {
     DANMAKU,

@@ -2,103 +2,77 @@ package com.raiya.frontend;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.Input;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.raiya.frontend.objects.GameObject;
 import com.raiya.frontend.objects.Player;
-import com.raiya.frontend.objects.bullets.Bullet;
 import com.raiya.frontend.objects.enemies.Boss;
 import com.raiya.frontend.objects.enemies.Fairy;
 import com.raiya.frontend.objects.items.Item;
 import com.raiya.frontend.objects.items.ItemType;
+import com.raiya.frontend.systems.AssetManager;
+import com.raiya.frontend.systems.EntityFactory;
 
 public class Main extends ApplicationAdapter {
     private ShapeRenderer shapeRenderer;
+    private SpriteBatch batch;
+    private List<GameObject> entities;
 
     private Player player;
-    private Fairy fairy;
+    private List<Fairy> fairy;
     private Boss boss;
-    private Item powerItem;
     private Item pointItem;
-    private List<GameObject> entities;
+    private Item powerItem;
 
     @Override
     public void create() {
         shapeRenderer = new ShapeRenderer();
+
+        // TODO 1: Create a SpriteBatch and store it in batch
+        batch = new SpriteBatch();
+
+        // TODO 2: Initialize the fairy and entities lists as empty ArrayLists
+        fairy = new ArrayList<>();
         entities = new ArrayList<>();
 
-        // 1. Player: Red square (movable with W/A/S/D or Arrows)
-        player = new Player(280, 40, "Reimu Hakurei", 100, 15, 3);
+        // TODO 3: Get the AssetManager instance and call init()
+        AssetManager.getInstance().init();
 
-        // 2. Fairy: Pink square (stationary)
-        fairy = new Fairy(150, 380, "Stage 1 Fairy", 20);
+        // TODO 4: Update how all entities are created! Follow the table and create using EntityFactory
+        player = EntityFactory.createPlayer(280, 40, "Reimu Hakurei", 100, 15, 3);
 
-        // 3. Boss: Blue square (stationary, larger size)
-        boss = new Boss(380, 400, "Cirno", 150);
+        Fairy redFairy = EntityFactory.createFairy(150, 380, "Red Fairy", 20);
+        Fairy blueFairy = EntityFactory.createFairy(250, 380, "Blue Fairy", 20, "fairy_idle_blue");
+        fairy.add(redFairy);
+        fairy.add(blueFairy);
 
-        // 4. Items: White squares (moving downwards linearly)
-        powerItem = new Item(200, 450, 16, 16, 80f, ItemType.POWER, 500L);
-        pointItem = new Item(320, 480, 12, 12, 120f, ItemType.POINT, 1000L);
+        boss = EntityFactory.createBoss(380, 400, "Rumia", 150) ;
 
+        powerItem = EntityFactory.createItem(200, 450, ItemType.POWER);
+        pointItem = EntityFactory.createItem(320, 480, ItemType.POINT);
+
+        // TODO 5: Add all the objects you have just created to entities
         entities.add(player);
-        entities.add(fairy);
+        entities.add(redFairy);
+        entities.add(blueFairy);
         entities.add(boss);
         entities.add(powerItem);
         entities.add(pointItem);
-    }
-
-    public static <T extends GameObject> void updateAndClean(java.util.List<T> list, float delta, float screenWidth, float screenHeight) {
-        // Complete this method
-        // 1. Get an Iterator<T> from the given list.
-
-        Iterator<T> iterator = list.iterator(); //iterator from list
-
-        while (iterator.hasNext()) {
-            T object = iterator.next();
-            object.update(delta);
-
-            // Added the missing || object.isDestroyed() condition
-            if (object.isOffScreen(screenWidth, screenHeight) || object.isDestroyed()) {
-                System.out.println("Removed via Generic Iterator: " + object.getClass().getSimpleName());
-                iterator.remove();
-            }
-        }
-        // 2. While there are still elements available (hasNext()):
-        //    a. Get the current element using next() and store it in a variable of type T.
-        //    b. Call update(delta) on the element.
-        //    c. If the element is off-screen (isOffScreen(screenWidth, screenHeight))
-        //       OR isDestroyed():
-        //       - Display the message: "Removed via Generic Iterator: " + [entity class name, using getClass().getSimpleName()]
-        //       - Remove the element from the list using the Iterator's method
-        //         (NOT list.remove()!).
     }
 
     @Override
     public void render() {
         float delta = Gdx.graphics.getDeltaTime();
 
-        // TODO 1: If the Z key was just pressed, add a new bullet from player.shootBullet()
-        if (Gdx.input.isKeyJustPressed(Input.Keys.Z)) {
-            entities.add(player.shootBullet());
-        }
-        // to the entities list.
-        // Clue: Gdx.input.isKeyJustPressed()
-
-        // TODO 2: Call updateAndClean(entities, delta, Gdx.graphics.getWidth(), Gdx.graphics.getHeight())
-        // to update and clean up destroyed/off-screen entities.
-        updateAndClean(entities, delta, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-
-
-        // 1. Iterative updates on entities list
-        for (GameObject entity : entities) {
-            entity.update(delta);
+        for (GameObject obj : entities) {
+            obj.update(delta);
         }
 
-        // 2. AABB Collision detection between entities
+        // AABB Collision detection
         for (int i = 0; i < entities.size(); i++) {
             for (int j = i + 1; j < entities.size(); j++) {
                 GameObject a = entities.get(i);
@@ -111,25 +85,27 @@ public class Main extends ApplicationAdapter {
             }
         }
 
-        // 3. Clear screen
         ScreenUtils.clear(0.1f, 0.1f, 0.15f, 1f);
 
-        // 4. Render filled hitboxes with ShapeRenderer
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        // Rendering Sprites using SpriteBatch
+        batch.begin();
         for (GameObject entity : entities) {
-            // TODO 3: Use an if statement to check whether the entity has not been destroyed (!entity.isDestroyed()).
-            // If so, call entity.render(shapeRenderer);
             if (!entity.isDestroyed()) {
-                entity.render(shapeRenderer);
+                // TODO: Call each entity's .render() method with the SpriteBatch as its argument.
+                entity.render(batch);
             }
         }
-        shapeRenderer.end();
+        batch.end();
     }
 
     @Override
     public void dispose() {
-        if (shapeRenderer != null) {
-            shapeRenderer.dispose();
+        if (batch != null) {
+            batch.dispose();
         }
+
+        // TODO: Call dispose on AssetManager to release the loaded Textures as well.
+        AssetManager.getInstance().dispose();
     }
+
 }

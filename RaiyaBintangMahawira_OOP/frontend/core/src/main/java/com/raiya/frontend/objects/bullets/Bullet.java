@@ -1,7 +1,6 @@
 package com.raiya.frontend.objects.bullets;
 
 import com.badlogic.gdx.graphics.Color;
-import com.raiya.frontend.objects.BulletType;
 import com.raiya.frontend.objects.Collidable;
 import com.raiya.frontend.objects.GameObject;
 import com.raiya.frontend.objects.enemies.Enemy;
