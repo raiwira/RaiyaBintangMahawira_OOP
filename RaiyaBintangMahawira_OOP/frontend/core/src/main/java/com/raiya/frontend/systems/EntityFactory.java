@@ -15,44 +15,9 @@ public class EntityFactory {
     // Create a Player and assign the 'player_idle' animation from AssetManager
     public static Player createPlayer(float x, float y, String name, int hp, int power, int spellCards) {
         Player player = new Player(x, y, name, hp, power, spellCards);
-        Animation<TextureRegion> anim = AssetManager.getInstance().getAnimation("player_idle");
-        player.setAnimation(anim);
+        Animation<TextureRegion> idleAnim = AssetManager.getInstance().getAnimation("player_idle");
+        player.setAnimation(idleAnim);
         return player;
-    }
-    // MISSING ; Fairy enemy and assign the 'fairy_idle' animation from AssetManager
-    public static Fairy createFairy(float x, float y, String name, int hp) {
-        Fairy fairy = new Fairy(x, y, name, hp);
-        // 2. Retrieve the "fairy_idle_red" animation using getAnimation(...)
-        //    from AssetManager.getInstance(). Store the result in
-        //    a local variable named `idleAnim`.
-        Animation<TextureRegion> idleAnim = AssetManager.getInstance().getAnimation("fairy_idle_red");
-        fairy.setAnimation(idleAnim);
-        return fairy;
-    }
-    public static Fairy createFairy(float x, float y, String name, int hp, String keyString) {
-        // TODO:
-        // 1. Create a new Fairy using x, y, name, and hp from the parameters;
-        //    store it in a local variable named `fairy`.
-        Fairy fairy = new Fairy(x, y, name, hp);
-        // 2. Retrieve the animation for keyString using getAnimation(...)
-        //    from AssetManager.getInstance(). Store the result in
-        //    a local variable named `idleAnim`.
-        Animation<TextureRegion> idelAnim = AssetManager.getInstance().getAnimation(keyString);
-        // 3. Assign idleAnim to fairy using fairy.setAnimation(...).
-        fairy.setAnimation(idelAnim);
-        // 4. Return fairy.
-        return fairy;
-    }
-
-    // MISSING ; Boss enemy and assign the 'boss_idle' animation from AssetManager
-    public static Boss createBoss(float x, float y, String name, int hp) {
-        Boss boss = new Boss(x, y, name, hp);
-        // 2. Retrieve the "boss_idle" animation using getAnimation(...)
-        //    from AssetManager.getInstance(). Store the result in
-        //    a local variable named `idleAnim`.
-        Animation<TextureRegion> idleAnim = AssetManager.getInstance().getAnimation("boss_idle");
-        boss.setAnimation(idleAnim);
-        return boss;
     }
 
     // Create an Item and assign its sprite from AssetManager based on ItemType
@@ -69,11 +34,52 @@ public class EntityFactory {
         return item;
     }
 
+    public static Bullet createPlayerBullet(float x, float y, int damage, String spriteKey) {
+        // TODO 1: Retrieve TextureRegion using getTextureRegion(spriteKey)
+        TextureRegion sprite = AssetManager.getInstance().getTextureRegion(spriteKey);
+
+        // TODO 2: Create a new Bullet using x, y, BulletType.AMULET, and damage
+        Bullet bullet = new Bullet(x, y, BulletType.AMULET, damage);
+
+        // TODO 3: Assign sprite to bullet
+        bullet.setSprite(sprite);
+
+        // TODO 4: Return bullet
+        return bullet;
+    }
+
+    public static Bullet createPlayerBullet(float x, float y, int damage) {
+        // TODO 5: Call overloaded createPlayerBullet with "bullet_amulet"
+        return createPlayerBullet(x, y, damage, "bullet_amulet");
+    }
+
     // Create an enemy bullet (type DANMAKU, speed 0f, sprite bullet_danmaku)
     public static Bullet createEnemyBullet(float x, float y, int damage) {
         Bullet bullet = new Bullet(x, y, 0f, BulletType.DANMAKU, damage);
         TextureRegion sprite = AssetManager.getInstance().getTextureRegion("bullet_danmaku");
         bullet.setSprite(sprite);
         return bullet;
+    }
+
+    public static Fairy createFairy(float x, float y, String name, int hp){
+        Fairy fairy = new Fairy(x, y, name, hp);
+        // FIX: Change "fairy_idle" to "fairy_idle_red"
+        Animation<TextureRegion> idleAnim = AssetManager.getInstance().getAnimation("fairy_idle_red");
+        fairy.setAnimation(idleAnim);
+        return fairy;
+    }
+
+    public static Boss createBoss(float x, float y, String name, int hp){
+        Boss boss = new Boss(x, y, name, hp);
+        Animation<TextureRegion> idleAnim = AssetManager.getInstance().getAnimation("boss_idle");
+        boss.setAnimation(idleAnim);
+        return boss;
+    }
+
+    public static Fairy createFairy(float x, float y, String name, int hp, String keyString) {
+        Fairy fairy = new Fairy(x, y, name, hp);
+        Animation<TextureRegion> idleAnim = AssetManager.getInstance().getAnimation(keyString);
+        fairy.setAnimation(idleAnim);
+        return fairy;
     }
 }

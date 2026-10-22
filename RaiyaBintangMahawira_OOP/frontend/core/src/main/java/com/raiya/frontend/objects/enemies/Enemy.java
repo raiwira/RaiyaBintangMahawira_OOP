@@ -11,6 +11,23 @@ public class Enemy extends GameObject {
     protected int hp;
     protected int maxHp;
     protected long scoreValue;
+    protected float collisionCooldown = 0f;
+
+    @Override
+    public void update(float delta) {
+        super.update(delta);
+        if (collisionCooldown > 0) {
+            collisionCooldown -= delta;
+        }
+    }
+
+    public boolean canTriggerCollision() {
+        if (collisionCooldown <= 0) {
+            collisionCooldown = 1.0f; // Sets a 1-second cooldown
+            return true;
+        }
+        return false;
+    }
 
     public Enemy(String name, int hp) {
         super(200, 380, 24, 24, 0, Color.PINK);
@@ -37,6 +54,7 @@ public class Enemy extends GameObject {
         System.out.println(name + " took " + damage + " damage! HP: " + this.hp + "/" + this.maxHp);
         if (wasAlive && this.hp == 0) {
             System.out.println(name + " was defeated!");
+            com.raiya.frontend.systems.AssetManager.getInstance().playSound("death"); // Death SFX
             destroy();
             return true;
         }

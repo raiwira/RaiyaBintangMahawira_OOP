@@ -3,18 +3,22 @@ package com.raiya.frontend.objects;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
-import com.raiya.frontend.objects.bullets.BulletType;
-import com.raiya.frontend.objects.enemies.Enemy;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.raiya.frontend.objects.bullets.Bullet;
 import com.raiya.frontend.objects.items.Item;
 import com.raiya.frontend.objects.items.ItemType;
-import com.raiya.frontend.objects.bullets.Bullet;
+import com.raiya.frontend.objects.enemies.Enemy;
+import com.raiya.frontend.systems.AssetManager;
+import com.raiya.frontend.systems.EntityFactory;
 
-public class Player extends com.raiya.frontend.objects.GameObject {
+public class Player extends GameObject {
     private String name;
     private int hp;
     private int power;
     private int spellCards;
     private long score;
+    private int currentDir = 0;
 
     public Player(String name, int hp, int power, int spellCards) {
         super(280, 40, 32, 48, 200f, Color.RED);
@@ -36,7 +40,12 @@ public class Player extends com.raiya.frontend.objects.GameObject {
 
     @Override
     public void update(float delta) {
-        // Player movement handling (LibGDX input)
+        // TODO 1: Call GameObject's update(delta) through super.
+        super.update(delta);
+
+        // TODO 2: Declare a local float variable dx with an initial value of 0
+        float dx = 0;
+
         if (Gdx.input != null) {
             if (Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP)) {
                 y += speed * delta;
@@ -46,17 +55,55 @@ public class Player extends com.raiya.frontend.objects.GameObject {
             }
             if (Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
                 x -= speed * delta;
+                // TODO 3: Adjust dx to match the direction.
+                dx -= 1;
             }
             if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
                 x += speed * delta;
+                // TODO 4: Adjust dx to match the direction.
+                dx += 1;
+            }
+        }
+
+        // TODO 5: Call updateAnimationState(dx)
+        updateAnimationState(dx);
+    }
+
+    public void updateAnimationState(float dx) {
+        AssetManager assets = AssetManager.getInstance();
+        if (dx < 0) {
+            // TODO:
+            // 1. Only make the following changes if currentDir is not -1.
+            if (currentDir != -1) {
+                // 2. Set currentDir to -1.
+                currentDir = -1;
+                // 3. Retrieve the "player_left" animation using assets.getAnimation(...).
+                Animation<TextureRegion> anim = assets.getAnimation("player_left");
+                // 4. If anim is not null, assign it using setAnimation(...).
+                if (anim != null) {
+                    setAnimation(anim);
+                }
+            }
+        } else if (dx > 0) {
+            // TODO:
+            if (currentDir != 1) {
+                currentDir = 1;
+                Animation<TextureRegion> anim = assets.getAnimation("player_right");
+                if (anim != null) {
+                    setAnimation(anim);
+                }
+            }
+        } else {
+            // TODO:
+            if (currentDir != 0) {
+                currentDir = 0;
+                Animation<TextureRegion> anim = assets.getAnimation("player_idle");
+                if (anim != null) {
+                    setAnimation(anim);
+                }
             }
         }
     }
-
-    public void moveUp(float delta) { this.y += speed * delta; }
-    public void moveDown(float delta) { this.y -= speed * delta; }
-    public void moveLeft(float delta) { this.x -= speed * delta; }
-    public void moveRight(float delta) { this.x += speed * delta; }
 
     @Override
     public void onCollision(Collidable other) {
@@ -71,16 +118,24 @@ public class Player extends com.raiya.frontend.objects.GameObject {
         System.out.println(getName() + " shoots " + target.getName() + " dealing " + damage + " DMG!");
         boolean defeated = target.takeDamage(damage);
         if (defeated) {
+            AssetManager.getInstance().playSound("death");
             addScore(target.getScoreValue());
         }
     }
+
     public Bullet shootBullet() {
         int damage = 10 + power;
         System.out.println(name + " shoots bullet dealing " + damage + " DMG!");
-        return new Bullet(x + width / 2 - 4, y + height, BulletType.AMULET, damage);
+
+        AssetManager.getInstance().playSound("shoot"); // Trigger shoot SFX
+
+        // TODO: Return a Bullet using EntityFactory
+        return EntityFactory.createPlayerBullet(x + (width / 2) - 8, y + height, damage);
     }
 
     public void collectItem(Item item) {
+        AssetManager.getInstance().playSound("item"); // Trigger item pickup SFX
+
         ItemType type = item.getItemTypeEnum();
         if (type != null) {
             switch (type) {
@@ -104,8 +159,6 @@ public class Player extends com.raiya.frontend.objects.GameObject {
                     System.out.println(name + " collected LIFE item! HP: " + hp);
                 }
             }
-            // TODO: Mark this item as destroyed so it can later be removed by the Iterator
-            // Call the item's destroy() method here!
             item.destroy();
         } else {
             addScore(item.getScoreValue());

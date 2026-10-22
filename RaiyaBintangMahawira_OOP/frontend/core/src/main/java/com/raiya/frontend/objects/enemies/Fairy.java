@@ -16,7 +16,9 @@ public class Fairy extends Enemy {
     @Override
     public void onCollision(Collidable other) {
         if (other instanceof Player) {
-            System.out.println("Player touches fairy");
+            if (canTriggerCollision()) {
+                System.out.println("Player touches fairy");
+            }
         }
     }
 }
