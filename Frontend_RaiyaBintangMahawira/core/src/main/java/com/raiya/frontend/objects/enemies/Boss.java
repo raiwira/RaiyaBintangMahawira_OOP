@@ -2,7 +2,7 @@ package com.raiya.frontend.objects.enemies;
 
 import com.badlogic.gdx.graphics.Color;
 import com.raiya.frontend.objects.Collidable;
-import com.raiya.frontend.objects.Enemy;
+import com.raiya.frontend.objects.enemies.Enemy;
 import com.raiya.frontend.objects.Player;
 
 public class Boss extends Enemy {
@@ -21,7 +21,9 @@ public class Boss extends Enemy {
         // TODO: Check whether the other received by this method is a Player
         // TODO: Print "Player touches boss"
         if (other instanceof Player) {
-            System.out.println("Player touches boss");
+            if (canTriggerCollision()) {
+                System.out.println("Player touches boss");
+            }
         }
     }
 

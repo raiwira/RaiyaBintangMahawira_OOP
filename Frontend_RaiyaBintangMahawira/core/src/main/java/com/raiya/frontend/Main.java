@@ -5,10 +5,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.raiya.frontend.objects.enemies.Boss;
-import com.raiya.frontend.enemies.Fairy;
-import com.raiya.frontend.objects.Item;
+import com.raiya.frontend.objects.items.Item;
 import com.raiya.frontend.objects.GameObject;
 import com.raiya.frontend.objects.Player;
+import com.raiya.frontend.objects.enemies.Fairy;
 import com.raiya.frontend.objects.items.ItemType;
 
 import java.util.ArrayList;
@@ -57,6 +57,9 @@ public class Main extends ApplicationAdapter {
                 GameObject a = entities.get(i);
                 GameObject b = entities.get(j);
 
+                // AA ; ignore items already collected
+                boolean aCollected = (a instanceof Item itemA) && itemA.isCollected();
+                boolean bCollected = (b instanceof Item itemB) && itemB.isCollected();
                 // TODO: Check whether getCoreHitbox() of a and b overlap (use the .overlaps() method of Rectangle)
                 // TODO: Call a.onCollision(b) and b.onCollision(a)
                 if (a.getCoreHitbox().overlaps(b.getCoreHitbox())) {
@@ -65,7 +68,8 @@ public class Main extends ApplicationAdapter {
                 }
             }
         }
-
+        // AA ; remove collected items from the list
+        entities.removeIf(obj -> (obj instanceof Item item) && item.isCollected());
 
         ScreenUtils.clear(0.1f, 0.1f, 0.15f, 1f);
 

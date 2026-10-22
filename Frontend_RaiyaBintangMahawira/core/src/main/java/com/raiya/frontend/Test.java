@@ -1,9 +1,9 @@
 package com.raiya.frontend;
 
 import com.raiya.frontend.objects.enemies.Boss;
-import com.raiya.frontend.objects.Enemy;
+import com.raiya.frontend.objects.enemies.Enemy;
 import com.raiya.frontend.objects.enemies.Fairy;
-import com.raiya.frontend.objects.Item;
+import com.raiya.frontend.objects.items.Item;
 import com.raiya.frontend.objects.Player;
 
 public class Test {

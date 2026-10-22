@@ -9,6 +9,10 @@ public class Item extends GameObject {
     private String itemType;
     private long scoreValue;
     private ItemType itemTypeEnum;
+    private boolean collected = false;
+
+    public boolean isCollected() { return collected; }
+    public void setCollected(boolean collected) { this.collected = collected; }
 
     public Item(float x, float y, String itemType) {
         super(x, y, 16, 16, 100f, Color.WHITE);
@@ -53,7 +57,6 @@ public class Item extends GameObject {
             // Item pickup is handled on the Player side via collectItem()
         }
     }
-
 
     public ItemType getItemTypeEnum() { return itemTypeEnum; }
 

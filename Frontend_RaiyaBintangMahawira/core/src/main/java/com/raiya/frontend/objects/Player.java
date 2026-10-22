@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.raiya.frontend.objects.items.Item;
-import com.raiya.frontend.objects.Enemy;
+import com.raiya.frontend.objects.enemies.Enemy;
 import com.raiya.frontend.objects.items.ItemType;
 
 public class Player extends GameObject {
@@ -24,7 +24,7 @@ public class Player extends GameObject {
     }
 
     public Player(float x, float y, String name, int hp, int power, int spellCards) {
-        super(x, y, 32, 32, 0, Color.RED);
+        super(x, y, 32, 32, 200f, Color.RED); // Changed speed from 0 to 200f so you can move!
         this.name = name;
         this.hp = hp;
         this.power = power;
@@ -35,29 +35,26 @@ public class Player extends GameObject {
     @Override
     public void update(float delta) {
         if (Gdx.input != null) {
-            // TODO: Check W / UP input   → y += speed * delta
-            if (Gdx.input.isKeyPressed(Input.Keys.Y) || Gdx.input.isKeyPressed(Input.Keys.UP)) {
+            if (Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP)) {
                 y += speed * delta;
             }
             // TODO: Check S / DOWN input → y -= speed * delta
             if (Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-                y += speed * delta;
+                y -= speed * delta;
             }
             // TODO: Check A / LEFT input → x -= speed * delta
             if (Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-                y += speed * delta;
+                x -= speed * delta;
             }
             // TODO: Check D / RIGHT input → x += speed * delta
             if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-                y += speed * delta;
+                x += speed * delta;
             }
         }
     }
 
     @Override
     public void onCollision(Collidable other) {
-        // TODO: Check whether the other received by this method is an Item
-        // TODO: Print "Player touches items" then call collectItem((Item) other)
         if (other instanceof Item) {
             System.out.println("Player touches items");
             collectItem((Item) other);
@@ -65,36 +62,32 @@ public class Player extends GameObject {
     }
 
     public void collectItem(Item item) {
+        // additional assignment ; collect item
+        if (item.isCollected()) {
+            return;
+        }
+        item.setCollected(true);
+
         ItemType type = item.getItemTypeEnum();
         if (type != null) {
             switch (type) {
                 case POWER -> {
-                    // 1. Increase power by type.getPowerBonus() via this.power
                     this.power += type.getPowerBonus();
-                    // 2. Add score by item.getScoreValue() via addScore() (addScore() already automatically prints "gained X pts!")
                     addScore(item.getScoreValue());
-                    // 3. Print: [name] collected POWER item! Power increased to [power]
                     System.out.println(name + " collected POWER item! Power increased to " + this.power);
                 }
                 case POINT -> {
-                    // 1. Add score by item.getScoreValue() via addScore()
                     addScore(item.getScoreValue());
-                    // 2. Print: [name] collected POINT item!
+                    System.out.println(name + " collected POINT item!");
                 }
                 case BOMB -> {
-                    // 1. Increase spellCards by 1
                     this.spellCards += 1;
-                    // 2. Add score by item.getScoreValue() via addScore()
                     addScore(item.getScoreValue());
-                    // 3. Print: [name] collected BOMB item! SpellCards: [spellCards]
                     System.out.println(name + " collected BOMB item! SpellCards: " + this.spellCards);
                 }
                 case LIFE -> {
-                    // 1. Increase hp by 20
                     this.hp += 20;
-                    // 2. Add score by item.getScoreValue() via addScore()
                     addScore(item.getScoreValue());
-                    // 3. Print: [name] collected LIFE item! HP: [hp]
                     System.out.println(name + " collected LIFE item! HP: " + this.hp);
                 }
             }
@@ -124,13 +117,6 @@ public class Player extends GameObject {
 
     public boolean isAlive() {
         return getHp() > 0;
-    }
-
-    public void collectItem(Item item) {
-        System.out.println(getName() + " collected " + item.getItemType() + "!");
-        if (item.getScoreValue() > 0) {
-            addScore(item.getScoreValue());
-        }
     }
 
     public void addScore(long points) {

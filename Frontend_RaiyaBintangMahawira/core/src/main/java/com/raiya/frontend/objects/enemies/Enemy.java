@@ -1,12 +1,31 @@
-package com.raiya.frontend.objects;
+package com.raiya.frontend.objects.enemies;
 
 import com.badlogic.gdx.graphics.Color;
+import com.raiya.frontend.objects.GameObject;
+import com.raiya.frontend.objects.Player;
 
 public class Enemy extends GameObject {
-    private String name;
-    private int hp;
-    private int maxHp;
+    protected String name;
+    protected int hp;
+    protected int maxHp;
     protected long scoreValue;
+    protected float collisionCooldown = 0f; //AA
+
+    @Override
+    public void update(float delta) {
+        super.update(delta);
+        if (collisionCooldown > 0) {
+            collisionCooldown -= delta;
+        }
+    }
+
+    public boolean canTriggerCollision() {
+        if (collisionCooldown <= 0) {
+            collisionCooldown = 1.0f; // 1 second cooldown
+            return true;
+        }
+        return false;
+    }
 
     public Enemy(String name, int hp) {
         super(200, 380, 24, 24, 0, Color.PINK);

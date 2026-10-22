@@ -2,7 +2,7 @@ package com.raiya.frontend.objects.enemies;
 
 import com.badlogic.gdx.graphics.Color;
 import com.raiya.frontend.objects.Collidable;
-import com.raiya.frontend.objects.Enemy;
+import com.raiya.frontend.objects.enemies.Enemy;
 import com.raiya.frontend.objects.Player;
 import com.raiya.frontend.objects.items.Item;
 
@@ -20,7 +20,9 @@ public class Fairy extends Enemy {
         // TODO: Check whether the other received by this method is a Player
         // TODO: Print "Player touches fairy")
         if (other instanceof Player) {
-            System.out.println("Player touches fairy");
+            if (canTriggerCollision()) {
+                System.out.println("Player touches fairy");
+            }
         }
     }
 }
