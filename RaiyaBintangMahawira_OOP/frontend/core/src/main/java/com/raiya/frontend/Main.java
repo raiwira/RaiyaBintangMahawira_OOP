@@ -2,6 +2,7 @@ package com.raiya.frontend;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -12,6 +13,8 @@ import com.raiya.frontend.objects.enemies.Fairy;
 import com.raiya.frontend.objects.items.Item;
 import com.raiya.frontend.objects.items.ItemType;
 import com.raiya.frontend.systems.AssetManager;
+import com.raiya.frontend.systems.BulletManager;
+import com.raiya.frontend.systems.CollisionReferee;
 import com.raiya.frontend.systems.EntityFactory;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +28,11 @@ public class Main extends ApplicationAdapter {
     private Boss boss;
     private Item pointItem;
     private Item powerItem;
+    // TODO: Create a private field to store BulletManager
+    private BulletManager bulletManager;
+    // TODO: Create a private field to store CollisionReferee
+    private CollisionReferee CollisionReferee;
+    private float enemyShootTimer = 0f;
 
     public Main() {
     }
@@ -34,6 +42,8 @@ public class Main extends ApplicationAdapter {
         this.batch = new SpriteBatch();
         this.fairy = new ArrayList();
         this.entities = new ArrayList();
+        this.bulletManager = new BulletManager();
+
         AssetManager.getInstance().init();
         AssetManager.getInstance().playMusic("bgm", true);
         this.player = EntityFactory.createPlayer(280.0F, 40.0F, "Reimu Hakurei", 100, 15, 3);
@@ -52,38 +62,55 @@ public class Main extends ApplicationAdapter {
         this.entities.add(this.pointItem);
     }
 
+    private void updateEnemyScheduler(float delta) {
+        enemyShootTimer += delta;
+        if (enemyShootTimer >= 1.5f) {
+            boss.shootBullet(bulletManager);
+            enemyShootTimer = 0f;
+        }
+    }
+
+
+    // ...
+
+    @Override
     public void render() {
         float delta = Gdx.graphics.getDeltaTime();
-        if (Gdx.input.isKeyJustPressed(54)) {
-            this.entities.add(this.player.shootBullet());
-        }
 
-        for(GameObject obj : this.entities) {
-            obj.update(delta);
-        }
-
-        for(int i = 0; i < this.entities.size(); ++i) {
-            for(int j = i + 1; j < this.entities.size(); ++j) {
-                GameObject a = (GameObject)this.entities.get(i);
-                GameObject b = (GameObject)this.entities.get(j);
-                if (!a.isDestroyed() && !b.isDestroyed() && a.getCoreHitbox().overlaps(b.getCoreHitbox())) {
-                    a.onCollision(b);
-                    b.onCollision(a);
-                }
+        // TODO: Create player input. If key Z is pressed call
+        // player.shootBullet(bulletManager);
+        if (Gdx.input.isKeyJustPressed(Input.Keys.Z)){
+            player.shootBullet(bulletManager);
             }
-        }
 
-        ScreenUtils.clear(0.1F, 0.1F, 0.15F, 1.0F);
-        this.batch.begin();
+        // TODO: Periodic firing scheduler for Boss Rumia
+        updateEnemyScheduler(delta);
 
-        for(GameObject entity : this.entities) {
+        // TODO: Generic update & clean for standard entities (Player, Enemy, Item)
+        updateAndClean(entities, delta, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
+        // TODO: Update and recycle Object Pool
+
+        // TODO: Evaluate & resolve all collisions via
+        // Mediator Pattern
+
+        // TODO: Clear screen
+        ScreenUtils.clear(0.1f, 0.1f, 0.15f, 1f);
+
+        batch.begin();
+        for (GameObject entity : entities) {
             if (!entity.isDestroyed()) {
-                entity.render(this.batch);
+                entity.render(batch);
             }
         }
 
-        this.batch.end();
+        // TODO: Render all active bullets from the pool
+
+        batch.end();
     }
+
+// ...
+
 
     public void dispose() {
         if (this.batch != null) {

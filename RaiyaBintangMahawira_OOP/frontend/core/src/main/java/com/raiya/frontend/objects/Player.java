@@ -5,11 +5,14 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Rectangle;
 import com.raiya.frontend.objects.bullets.Bullet;
 import com.raiya.frontend.objects.items.Item;
 import com.raiya.frontend.objects.items.ItemType;
 import com.raiya.frontend.objects.enemies.Enemy;
+import com.raiya.frontend.objects.patterns.ShootingPattern;
 import com.raiya.frontend.systems.AssetManager;
+import com.raiya.frontend.systems.BulletManager;
 import com.raiya.frontend.systems.EntityFactory;
 
 public class Player extends GameObject {
@@ -19,6 +22,11 @@ public class Player extends GameObject {
     private int spellCards;
     private long score;
     private int currentDir = 0;
+
+    // TODO: Declare a private field named shootingPattern of type ShootingPattern.
+    //       No need to initialize it right away.
+    private ShootingPattern shootingPattern;
+
 
     public Player(String name, int hp, int power, int spellCards) {
         super(280, 40, 32, 48, 200f, Color.RED);
@@ -104,6 +112,21 @@ public class Player extends GameObject {
             }
         }
     }
+    @Override
+    public Rectangle getCoreHitbox() {
+        // TODO: Return a new 8x8 Rectangle centered right in the middle of the sprite:
+        // - X coordinate: x + (width / 2f) - 4f
+        // - Y coordinate: y + (height / 2f) - 4f
+        // - width: 8f, height: 8f
+        return new Rectangle(x + (width / 2f) - 4f, y + (height / 2f) - 4f, 8f, 8f);
+    }
+
+    @Override
+    public Rectangle getGrazeHitbox() {
+        // TODO: Return a new Rectangle at position coordinates (x, y)
+        //       covering the entire visual sprite dimensions (width, height)
+        return new Rectangle(x, y, width, height);
+    }
 
     @Override
     public void onCollision(Collidable other) {
@@ -123,14 +146,21 @@ public class Player extends GameObject {
         }
     }
 
-    public Bullet shootBullet() {
-        int damage = 10 + power;
-        System.out.println(name + " shoots bullet dealing " + damage + " DMG!");
+    // TODO: Update shootBullet() to shootBullet(BulletManager bulletManager)!
+    public void shootBullet(BulletManager bulletManager) {
+        // - If bulletManager is null, return immediately
+        if (bulletManager == null) return;
 
-        AssetManager.getInstance().playSound("shoot"); // Trigger shoot SFX
+        AssetManager.getInstance().playSound("shoot");
 
-        // TODO: Return a Bullet using EntityFactory
-        return EntityFactory.createPlayerBullet(x + (width / 2) - 8, y + height, damage);
+        // - If shootingPattern is not null, call execute() from the player's muzzle coordinates (x + width / 2f - 8f, y + height)
+        // - If shootingPattern is null, call bulletManager.spawnPlayerBullet() directly
+        if (shootingPattern != null) {
+            shootingPattern.execute(x + (width / 2f) - 8f, y + height, bulletManager, true);
+        } else {
+            int damage = 10 + power;
+            bulletManager.spawnPlayerBullet(x + (width / 2f) - 8f, y + height, 0f, 400f, damage);
+        }
     }
 
     public void collectItem(Item item) {
@@ -186,6 +216,11 @@ public class Player extends GameObject {
     }
 
     // Encapsulation getters and setters
+
+    // TODO: Provide a getter and setter for shootingPattern
+    public ShootingPattern getShootingPattern() { return shootingPattern; }
+    public void setShootingPattern(ShootingPattern shootingPattern) { this.shootingPattern = shootingPattern; }
+
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
 
