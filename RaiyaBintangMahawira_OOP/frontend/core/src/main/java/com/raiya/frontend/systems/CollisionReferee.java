@@ -48,31 +48,22 @@ public class CollisionReferee {
         // TODO Code for Question 4:
         // - Loop through each bullet in ActiveEnemyBullets.
         //   - If the bullet is already destroyed, skip it (continue)
-        for (Bullet bullet : bulletManager.getActivePlayerBullets()) {
+        // 2. Evaluate Enemy Bullets vs Player (Core Hit vs Graze Hit)
+        for (Bullet bullet : bulletManager.getActiveEnemyBullets()) { // FIX 1: activeEnemyBullets
             if (bullet.isDestroyed()) continue;
 
-            if (player.isDestroyed()) {
-                //
-                //     - PRIORITY 1: Core Hit (Player was Shot)
-                //       - Check whether the bullet's Core Hitbox collides with the player's Core Hitbox.
-                //       - If YES:
+            if (!player.isDestroyed()) { // FIX 2: Added "!" to check if player is ALIVE
+                // PRIORITY 1: Core Hit (Player was Shot)
                 if (bullet.getCoreHitbox().overlaps(player.getCoreHitbox())) {
                     player.takeDamage(bullet.getDamage());
                     bullet.destroy();
                 }
-                //     - PRIORITY 2: Graze Hit (Bullet Grazes Player)
+                // PRIORITY 2: Graze Hit (Bullet Grazes Player)
                 else if (!bullet.hasBeenGrazed() && bullet.getCoreHitbox().overlaps(player.getGrazeHitbox())){
                     bullet.setGrazed(true);
                     player.addScore(50);
                     System.out.println(player.getName() + " grazed an enemy bullet +50!");
-
                 }
-                //       - Check if the bullet has NOT been grazed yet
-                //         AND the bullet's Core Hitbox touches the player's Graze Hitbox.
-                //       - If YES:
-                //         * Mark the bullet as grazed.
-                //         * Give the graze score bonus to the player: player.addScore(50)
-                // 3. Evaluate Player vs Items and Physical Enemy Contact
             }
         }
         // TODO Code for Question 5:

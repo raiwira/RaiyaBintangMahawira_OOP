@@ -4,119 +4,134 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.raiya.frontend.systems.AssetManager;
+import com.raiya.frontend.systems.BulletManager;
+import com.raiya.frontend.systems.CollisionReferee;
+import com.raiya.frontend.systems.EntityFactory;
 import com.raiya.frontend.objects.GameObject;
 import com.raiya.frontend.objects.Player;
 import com.raiya.frontend.objects.enemies.Boss;
 import com.raiya.frontend.objects.enemies.Fairy;
 import com.raiya.frontend.objects.items.Item;
 import com.raiya.frontend.objects.items.ItemType;
-import com.raiya.frontend.systems.AssetManager;
-import com.raiya.frontend.systems.BulletManager;
-import com.raiya.frontend.systems.CollisionReferee;
-import com.raiya.frontend.systems.EntityFactory;
+
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class Main extends ApplicationAdapter {
-    private ShapeRenderer shapeRenderer;
     private SpriteBatch batch;
-    private List<GameObject> entities;
+
     private Player player;
     private List<Fairy> fairy;
     private Boss boss;
-    private Item pointItem;
     private Item powerItem;
-    // TODO: Create a private field to store BulletManager
+    private Item pointItem;
+    private List<GameObject> entities;
+
+    // CS Module 7: Systems
     private BulletManager bulletManager;
-    // TODO: Create a private field to store CollisionReferee
-    private CollisionReferee CollisionReferee;
+    private CollisionReferee collisionReferee;
     private float enemyShootTimer = 0f;
 
-    public Main() {
-    }
-
+    @Override
     public void create() {
-        this.shapeRenderer = new ShapeRenderer();
-        this.batch = new SpriteBatch();
-        this.fairy = new ArrayList();
-        this.entities = new ArrayList();
-        this.bulletManager = new BulletManager();
+        batch = new SpriteBatch();
+        fairy = new ArrayList<>();
+        entities = new ArrayList<>();
 
+        // Instantiate systems
+        bulletManager = new BulletManager();
+        collisionReferee = new CollisionReferee();
+
+        // 1. Centralized Asset Registration (AssetManager Singleton + Flyweight)
         AssetManager.getInstance().init();
-        AssetManager.getInstance().playMusic("bgm", true);
-        this.player = EntityFactory.createPlayer(280.0F, 40.0F, "Reimu Hakurei", 100, 15, 3);
-        Fairy redFairy = EntityFactory.createFairy(150.0F, 380.0F, "Red Fairy", 20);
-        Fairy blueFairy = EntityFactory.createFairy(250.0F, 380.0F, "Blue Fairy", 20, "fairy_idle_blue");
-        this.fairy.add(redFairy);
-        this.fairy.add(blueFairy);
-        this.boss = EntityFactory.createBoss(380.0F, 400.0F, "Rumia", 150);
-        this.powerItem = EntityFactory.createItem(200.0F, 450.0F, ItemType.POWER);
-        this.pointItem = EntityFactory.createItem(320.0F, 480.0F, ItemType.POINT);
-        this.entities.add(this.player);
-        this.entities.add(redFairy);
-        this.entities.add(blueFairy);
-        this.entities.add(this.boss);
-        this.entities.add(this.powerItem);
-        this.entities.add(this.pointItem);
+        AssetManager.getInstance().playMusic("bgm", true); // Plays Rumia's theme on loop
+
+        // 2. Instantiate entities via Factory Pattern (EntityFactory)
+        player = EntityFactory.createPlayer(280, 40, "Reimu Hakurei", 100, 15, 3);
+        fairy.add(EntityFactory.createFairy(150, 380, "Red Fairy", 20));
+        fairy.add(EntityFactory.createFairy(250, 380, "Blue Fairy", 20, "fairy_idle_blue"));
+        boss = EntityFactory.createBoss(380, 400, "Rumia", 150);
+        powerItem = EntityFactory.createItem(200, 450, ItemType.POWER);
+        pointItem = EntityFactory.createItem(320, 480, ItemType.POINT);
+
+        entities.add(player);
+        entities.addAll(fairy);
+        entities.add(boss);
+        entities.add(powerItem);
+        entities.add(pointItem);
     }
 
     private void updateEnemyScheduler(float delta) {
         enemyShootTimer += delta;
         if (enemyShootTimer >= 1.5f) {
-            boss.shootBullet(bulletManager);
+            if (boss != null && !boss.isDestroyed()) {
+                boss.shootBullet(bulletManager);
+            }
             enemyShootTimer = 0f;
         }
     }
-
-
-    // ...
 
     @Override
     public void render() {
         float delta = Gdx.graphics.getDeltaTime();
 
-        // TODO: Create player input. If key Z is pressed call
-        // player.shootBullet(bulletManager);
-        if (Gdx.input.isKeyJustPressed(Input.Keys.Z)){
+        // 1. Check Player Bullet shooting input (Key Z)
+        if (Gdx.input.isKeyJustPressed(Input.Keys.Z)) {
             player.shootBullet(bulletManager);
-            }
+        }
 
-        // TODO: Periodic firing scheduler for Boss Rumia
+        // 2. Periodic firing scheduler for Boss Rumia
         updateEnemyScheduler(delta);
 
-        // TODO: Generic update & clean for standard entities (Player, Enemy, Item)
+        // 3. Generic update & safe removal of standard entities (Player, Enemy, Item)
         updateAndClean(entities, delta, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-        // TODO: Update and recycle Object Pool
+        // 4. Update and recycle Object Pool
+        bulletManager.update(delta, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-        // TODO: Evaluate & resolve all collisions via
-        // Mediator Pattern
+        // 5. Evaluate & resolve all collisions via Mediator Pattern
+        collisionReferee.resolveCollisions(player, entities, bulletManager);
 
-        // TODO: Clear screen
+        // 6. Clear screen
         ScreenUtils.clear(0.1f, 0.1f, 0.15f, 1f);
 
+        // 7. Render active entities and pooled bullets with SpriteBatch
         batch.begin();
+
         for (GameObject entity : entities) {
             if (!entity.isDestroyed()) {
                 entity.render(batch);
             }
         }
 
-        // TODO: Render all active bullets from the pool
+        // Render all active bullets from the pool
+        bulletManager.render(batch);
 
         batch.end();
     }
 
-// ...
+    // Generic Instance Method with Bounded Type Parameter <T extends GameObject>
+    public <T extends GameObject> void updateAndClean(List<T> list, float delta, float screenWidth, float screenHeight) {
+        Iterator<T> iterator = list.iterator();
+        while (iterator.hasNext()) {
+            T entity = iterator.next();
+            entity.update(delta);
 
-
-    public void dispose() {
-        if (this.batch != null) {
-            this.batch.dispose();
+            if (entity.isOffScreen(screenWidth, screenHeight) || entity.isDestroyed()) {
+                System.out.println("Removed via Generic Iterator: " + entity.getClass().getSimpleName());
+                iterator.remove(); // Safe removal using Iterator!
+            }
         }
+    }
 
+    @Override
+    public void dispose() {
+        if (batch != null) {
+            batch.dispose();
+        }
         AssetManager.getInstance().dispose();
     }
 }

@@ -26,7 +26,7 @@ public class Player extends GameObject {
     // TODO: Declare a private field named shootingPattern of type ShootingPattern.
     //       No need to initialize it right away.
     private ShootingPattern shootingPattern;
-
+    private float invincibilityTimer = 0f;
 
     public Player(String name, int hp, int power, int spellCards) {
         super(280, 40, 32, 48, 200f, Color.RED);
@@ -50,6 +50,10 @@ public class Player extends GameObject {
     public void update(float delta) {
         // TODO 1: Call GameObject's update(delta) through super.
         super.update(delta);
+
+        if (invincibilityTimer > 0) {
+            invincibilityTimer -= delta;
+        }
 
         // TODO 2: Declare a local float variable dx with an initial value of 0
         float dx = 0;
@@ -112,6 +116,7 @@ public class Player extends GameObject {
             }
         }
     }
+
     @Override
     public Rectangle getCoreHitbox() {
         // TODO: Return a new 8x8 Rectangle centered right in the middle of the sprite:
@@ -164,6 +169,8 @@ public class Player extends GameObject {
     }
 
     public void collectItem(Item item) {
+        if (item == null || item.isDestroyed()) return;
+
         AssetManager.getInstance().playSound("item"); // Trigger item pickup SFX
 
         ItemType type = item.getItemTypeEnum();
@@ -197,7 +204,14 @@ public class Player extends GameObject {
     }
 
     public void takeDamage(int damage) {
+        if (invincibilityTimer > 0 || !isAlive()) return;
+
         setHp(getHp() - damage);
+
+        if (isAlive()) {
+            invincibilityTimer = 1.0f;
+        }
+
         System.out.println(getName() + " took " + damage + " damage! Remaining HP: " + getHp());
         if (getHp() == 0) {
             System.out.println(getName() + " was defeated (Pichuun~)! ");
