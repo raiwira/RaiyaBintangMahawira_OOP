@@ -77,8 +77,8 @@ public class GameHUD implements GameObserver {
                 font.draw(batch, "=== TOUHOU PRACTICUM ===", 448, 540);
                 font.draw(batch, "HighScore: " + String.format("%09d", Math.max(score, 999990L)), 448, 500);
                 font.draw(batch, "Score:     " + String.format("%09d", score), 448, 470);
-                font.draw(batch, "Player:     " + (lives > 0 ? "★ ".repeat(lives) : "GAME OVER (Press R)"), 448, 430);
-                font.draw(batch, "SpellCards: " + "★ ".repeat(Math.max(0, spellCards)), 448, 390);
+                font.draw(batch, "Player:     " + (lives > 0 ? "* ".repeat(lives) : "GAME OVER (Press R)"), 448, 430);
+                font.draw(batch, "SpellCards: " + "* ".repeat(Math.max(0, spellCards)), 448, 390);
                 font.draw(batch, "Power:     " + power + " / 128", 448, 350);
                 font.draw(batch, "Graze:     " + grazeCount, 448, 310);
 
